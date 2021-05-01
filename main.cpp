@@ -12,10 +12,9 @@ using std::cin;
 using std::string;
 using namespace std;
 
-struct subvector {
-    int *mas; // указатель на первый элемент
-    int top; // длина вектора
-    int capacity; // объем памяти
+struct subvector{
+    int* mas;
+    int top, capacity;
 };
 
 void init(subvector *qv){
@@ -32,37 +31,34 @@ void output(string name, string file) {
     resout.close();
 }
 
-void push(subvector* qv){
-	for (int i = 0; i < qv->top;++i)
-		cout << qv->mas[i] << " ";
-}
-
-void push_back(subvector *qv, int d){
-    if ((qv -> top)*4 ==  qv -> capacity) {
-        qv -> top ++;
-        qv -> mas = (int*)realloc(qv -> mas,sizeof(int)*(qv -> top));
-        qv -> capacity = (qv -> capacity) *2;
+void push_back(subvector* qv, int d){
+    if (qv->capacity - qv->top == 0){
+        qv->mas = (int*)realloc(qv->mas, (qv->top *2) * sizeof(int));
         (qv -> mas)[qv -> top] = d;
+        qv->top ++;
+        qv -> capacity = (qv -> capacity) *2;
     }
     else{
-        qv -> top ++;
-        (qv -> mas)[qv -> top] = d;
+        qv->top ++;
+        qv->mas[qv->top] = d;
     }
 }
 
-void pop_back(subvector *qv) {
-    qv -> top --;
-    qv -> mas = (int*)realloc(qv -> mas,sizeof(int)*(qv -> top));
+int pop_back(subvector* qv){
+    int a = qv->mas[qv->top - 1];
+    qv->top --;
+    return a;
 }
 
 void push_front(subvector* qv, int d){
 	if (qv->capacity - qv->top == 0){
 		qv->mas = (int*)realloc(qv->mas, (qv->top * 2) * sizeof(int));
-		for (int i = qv->top; i > 0;--i)
-			qv->mas[i] = qv->mas[i - 1];
+		for (int i = qv->top; i > 0;--i) {
+            qv->mas[i] = qv->mas[i - 1];
+        }
 		qv->mas[0] = d;
 		qv->top++;
-		qv->capacity *= 2;
+        qv -> capacity = (qv -> capacity) *2;
 	}
 	else{
 		for (int i = qv->top; i > 0;--i)
@@ -84,11 +80,11 @@ void time_push_back(int n, subvector * qv){
 
 void time_pop_back(int n, subvector * qv){
 	for (int i = 1; i < n + 1; ++i) {
-        push_back(qv, 1);
+	    push_back(qv, 1);
     }
 	for (int i = n; i > 0; --i){
         auto start = std::chrono::high_resolution_clock::now();
-        pop_back(qv);
+        int a = pop_back(qv);
         auto end = std::chrono::high_resolution_clock::now();
         nanoseconds fs = duration_cast<nanoseconds > (end - start);
         output(std::to_string(fs.count()), "pop_back.txt");
@@ -126,7 +122,7 @@ void time_push_front_list(list<int>* list, int N){
 }
 int main(){
 	subvector v;
-	int  n, choice;
+	int n, choice;
 	list<int> list;
 	init(&v);
 	cin >> n;
